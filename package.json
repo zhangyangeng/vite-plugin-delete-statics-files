@@ -1,0 +1,23 @@
+{
+	"name": "vite-plugin-delete-statics-files",
+	"version": "1.0.0",
+	"description": "After compiling the static resources, delete certain static resource files.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zhangyangeng/vite-plugin-delete-statics-files.git"
+	},
+	"keywords": [
+		"vite",
+		"plugin"
+	],
+	"author": "zhangyangeng",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/zhangyangeng/vite-plugin-delete-statics-files/issues"
+	},
+	"homepage": "https://github.com/zhangyangeng/vite-plugin-delete-statics-files#readme"
+}

@@ -1,44 +1,11 @@
 import { type Plugin, normalizePath } from 'vite';
 
-import fs from 'fs';
 import path from 'path';
-
-/**
- * 配置信息
- */
-export interface Options {
-    // 待删文件名，支持正则表达式
-    fileName: string[];
-    // 静态资源目录下文件所属文件夹路径，不填则默认在静态资源根路径及所有子路径下寻找
-    dir?: string;
-    // 待删文件名是否为正则表达式
-    isRegExp?: boolean;
-}
+import { Options } from './types/Options';
+import { DirUtils } from './utils/DirUtils';
+import { FileUtils } from './utils/FileUtils';
 
 let outPut = '';
-
-/**
- * 删除指定文件
- *
- * @param {string} dirPath 文件路径
- * @param {string | RegExp} fileName 文件名
- */
-function deleteSpecifiedFile(dirPath: string, fileName: string[] | RegExp[]): void {
-    fs.readdirSync(dirPath).forEach((file) => {
-        const fullPath = path.join(dirPath, file);
-        if (fs.statSync(fullPath).isFile()) {
-            fileName.forEach((fn: string | RegExp) => {
-                if (typeof fn === 'string' && file === fn) {
-                    fs.unlinkSync(fullPath);
-                    console.log(`Deleted file: ${fullPath}`);
-                } else if (typeof fn === 'object' && (fn as RegExp).test(file)) {
-                    fs.unlinkSync(fullPath);
-                    console.log(`Deleted file: ${fullPath}`);
-                }
-            });
-        }
-    });
-}
 
 /**
  * 转换为正则表达式
@@ -55,36 +22,6 @@ function transformToRegExp(fileName: string[]): RegExp[] {
         console.error(e);
         return [];
     }
-}
-
-/**
- * 获取静态资源中的所有文件夹路径
- *
- * @param {string} rootPath 根路径
- * @returns {string[]} 所有的文件夹路径
- */
-function getAllDir(rootPath: string): string[] {
-    const dirs: string[] = [];
-
-    /**
-     * 遍历文件夹
-     *
-     * @param {string} folderPath 当前文件夹路径
-     */
-    function traverseFolder(folderPath: string): void {
-        const folderContents = fs.readdirSync(folderPath);
-        folderContents.forEach((item) => {
-            const fullPath = path.join(folderPath, item);
-            const stats = fs.statSync(fullPath);
-            if (stats.isDirectory()) {
-                dirs.push(normalizePath(fullPath));
-                traverseFolder(fullPath);
-            }
-        });
-    }
-
-    traverseFolder(rootPath);
-    return dirs;
 }
 
 /**
@@ -109,7 +46,7 @@ export function deleteStaticsFile(options: Options): Plugin {
             if (dir) {
                 dirPath = normalizePath(path.join(outPut, dir));
             } else {
-                dirPath = getAllDir(outPut);
+                dirPath = DirUtils.getAllDir(outPut);
             }
             // 文件名是否为正则表达式
             if (isRegExp) {
@@ -120,10 +57,10 @@ export function deleteStaticsFile(options: Options): Plugin {
             // 删除指定路径下的指定文件名
             if (tempFileName.length) {
                 if (typeof dirPath === 'string') {
-                    deleteSpecifiedFile(dirPath, tempFileName);
+                    FileUtils.deleteSpecifiedFile(dirPath, tempFileName);
                 } else {
                     dirPath.forEach((fp) => {
-                        deleteSpecifiedFile(fp, tempFileName);
+                        FileUtils.deleteSpecifiedFile(fp, tempFileName);
                     });
                 }
             }

@@ -15,6 +15,7 @@ import { deleteStaticsFile, type Options } from 'vite-plugin-delete-statics-file
 export default defineConfig({
     plugins: [
         deleteStaticsFile({
+            isRegExp: true,
             fileName: ['^monaco-delete.*\\.js$'],
         } as Options),
     ],
